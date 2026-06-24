@@ -1,9 +1,6 @@
 package com.learnkafka.producer;
 
-import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.ProducerConfig;
-import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.kafka.clients.producer.RecordMetadata;
+import org.apache.kafka.clients.producer.*;
 import org.apache.kafka.common.serialization.StringSerializer;
 
 import java.util.HashMap;
@@ -37,10 +34,25 @@ public class MessageProducer {
         return props;
     }
 
+    Callback callback = (metadata, exception) -> {
+        if (exception != null) {
+            log.error("Error in Callback is {}", exception.getMessage());
+        } else {
+            log.info("Callback is {} {}", metadata.offset(), metadata.partition());
+        }
+    };
+
+
+    public void publishMessageASync(String value, String message) {
+        ProducerRecord<String, String> record = new ProducerRecord<>(topicName, value, message);
+
+        kafkaProducer.send(record, callback);
+
+    }
+
     public void pushMessageSync(String key, String value) {
 
-        ProducerRecord<String, String> record =
-                new ProducerRecord<>(topicName, key, value);
+        ProducerRecord<String, String> record = new ProducerRecord<>(topicName, key, value);
 
         log.info("Sending Kafka message. topic={}, key={}, value={}", topicName, key, value);
 
@@ -56,11 +68,14 @@ public class MessageProducer {
         }
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
 
         MessageProducer messageProducer = new MessageProducer(propsMap());
 
-        messageProducer.pushMessageSync(null, "value1");
+        //messageProducer.pushMessageSync(null, "value1");
+
+        messageProducer.publishMessageASync("1", "2");
+        Thread.sleep(3000);
     }
 
 }
