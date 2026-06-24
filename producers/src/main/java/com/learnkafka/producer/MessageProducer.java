@@ -9,10 +9,14 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 
 public class MessageProducer {
 
-    String topicName = "hello";
+    //private static final Logger logger = LoggerFactory.getLogger(MessageProducer.class);
+
+    String topicName = "my-topic";
 
     KafkaProducer<String, String> kafkaProducer;
 
@@ -22,9 +26,14 @@ public class MessageProducer {
 
     public static Map<String, Object> propsMap() {
         Map<String, Object> props = new HashMap<>();
-        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092,localhost:9093,localhost:9094");
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:29092,localhost:29093,localhost:29094");
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+        props.put(ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG, 30000);
+        props.put(ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, 120000);
+        props.put(ProducerConfig.BATCH_SIZE_CONFIG, 10000);
+        props.put(ProducerConfig.LINGER_MS_CONFIG, 10);
+
         return props;
     }
 
@@ -45,7 +54,7 @@ public class MessageProducer {
 
         MessageProducer messageProducer = new MessageProducer(propsMap());
 
-        messageProducer.pushMessageSync("hello-0", "value1");
+        messageProducer.pushMessageSync(null, "value1");
     }
 
 }
