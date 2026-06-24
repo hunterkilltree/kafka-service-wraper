@@ -19,6 +19,9 @@ subprojects {
         testImplementation 'org.junit.jupiter:junit-jupiter'
         testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
         implementation 'org.apache.kafka:kafka-clients:4.3.0'
+
+        implementation 'org.slf4j:slf4j-api:2.0.13'
+        runtimeOnly 'ch.qos.logback:logback-classic:1.5.15'
     }
 }
 

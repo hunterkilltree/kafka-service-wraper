@@ -9,12 +9,12 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MessageProducer {
 
-    //private static final Logger logger = LoggerFactory.getLogger(MessageProducer.class);
+    private static final Logger log = LoggerFactory.getLogger(MessageProducer.class);
 
     String topicName = "my-topic";
 
@@ -38,15 +38,21 @@ public class MessageProducer {
     }
 
     public void pushMessageSync(String key, String value) {
-        ProducerRecord<String, String> record = new ProducerRecord<>(topicName, key, value);
+
+        ProducerRecord<String, String> record =
+                new ProducerRecord<>(topicName, key, value);
+
+        log.info("Sending Kafka message. topic={}, key={}, value={}", topicName, key, value);
 
         try {
-            RecordMetadata recordMetadata = kafkaProducer.send(record).get();
-            System.out.println("partition " + recordMetadata.partition() + ", offset : " + recordMetadata.offset());
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
+
+            RecordMetadata metadata = kafkaProducer.send(record).get();
+
+            log.info("Kafka message sent. topic={}, partition={}, offset={}", metadata.topic(), metadata.partition(), metadata.offset());
+
+        } catch (InterruptedException | ExecutionException e) {
+
+            log.error("Kafka send failed. topic={}, key={}", topicName, key, e);
         }
     }
 
