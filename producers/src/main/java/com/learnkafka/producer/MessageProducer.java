@@ -31,6 +31,10 @@ public class MessageProducer {
         props.put(ProducerConfig.BATCH_SIZE_CONFIG, 10000);
         props.put(ProducerConfig.LINGER_MS_CONFIG, 10);
 
+        props.put(ProducerConfig.ACKS_CONFIG, "all"); // all replicas have to get one message
+        props.put(ProducerConfig.RETRIES_CONFIG, 10); // retry 10 times each node
+        props.put(ProducerConfig.RETRY_BACKOFF_MS_CONFIG, 3000); // each time wait 3 seconds
+
         return props;
     }
 
@@ -50,7 +54,7 @@ public class MessageProducer {
 
     }
 
-    public void pushMessageSync(String key, String value) {
+    public void publishMessageSync(String key, String value) {
 
         ProducerRecord<String, String> record = new ProducerRecord<>(topicName, key, value);
 
@@ -68,11 +72,15 @@ public class MessageProducer {
         }
     }
 
+    public void close(){
+        kafkaProducer.close();
+    }
+
     public static void main(String[] args) throws InterruptedException {
 
         MessageProducer messageProducer = new MessageProducer(propsMap());
 
-        //messageProducer.pushMessageSync(null, "value1");
+        //messageProducer.publishMessageSync(null, "value1");
 
         messageProducer.publishMessageASync("1", "2");
         Thread.sleep(3000);

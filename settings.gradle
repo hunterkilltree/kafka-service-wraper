@@ -1,2 +1,3 @@
 rootProject.name = 'kafka-service-wrapper'
 include 'producers'
+include 'consumers'
